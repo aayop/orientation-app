@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orientation Académique</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Système d'Orientation</h1>
+        <p class="subtitle">Remplis ton profil pour découvrir ta carrière idéale</p>
+
+        <form id="form">
+            <div class="field">
+                <label>Genre</label>
+                <select name="Gender">
+                    <option value="Male">Homme</option>
+                    <option value="Female">Femme</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Âge</label>
+                <input type="number" name="Age" min="18" max="30" placeholder="ex: 21" required>
+            </div>
+            <div class="field">
+                <label>GPA</label>
+                <input type="number" name="GPA" step="0.1" min="0" max="4" placeholder="ex: 3.5" required>
+            </div>
+             <div class="field">
+                 <label>Spécialité (Major)</label>
+                 <select name="Major">
+                     <option value="Computer Science">Computer Science</option>
+                 </select>
+             </div>
+            <div class="field">
+                <label>Domaine d'intérêt</label>
+                <select name="Interested Domain">
+                    <option value="Web Development">Web Development</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                    <option value="Cloud Computing">Cloud Computing</option>
+                    <option value="Mobile App Development">Mobile App Development</option>
+                    <option value="Game Development">Game Development</option>
+                    <option value="Blockchain Technology">Blockchain Technology</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Projets réalisés</label>
+                <select name="Projects">
+                    <option value="Chatbot Development">Chatbot Development</option>
+                    <option value="Data Analytics">Data Analytics</option>
+                    <option value="E-commerce Website">E-commerce Website</option>
+                    <option value="Full-Stack Web App">Full-Stack Web App</option>
+                    <option value="Network Security">Network Security</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Python</label>
+                <select name="Python">
+                    <option value="Strong">Fort</option>
+                    <option value="Average">Moyen</option>
+                    <option value="Weak">Faible</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>SQL</label>
+                <select name="SQL">
+                    <option value="Strong">Fort</option>
+                    <option value="Average">Moyen</option>
+                    <option value="Weak">Faible</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Java</label>
+                <select name="Java">
+                    <option value="Strong">Fort</option>
+                    <option value="Average">Moyen</option>
+                    <option value="Weak">Faible</option>
+                </select>
+            </div>
+
+            <button type="submit">Prédire ma carrière</button>
+        </form>
+
+        <div id="result" class="result hidden">
+            <h2>Carrière recommandée :</h2>
+            <p id="career"></p>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
