@@ -15,15 +15,16 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
-    print("Received data:", data)
     df = pd.DataFrame([data])
 
     for col, le in le_dict.items():
         if col in df.columns:
             df[col] = le.transform(df[col])
 
-    df['Age'] = pd.to_numeric(df['Age'])
-    df['GPA'] = pd.to_numeric(df['GPA'])
+    numeric_cols = ['note_maths', 'note_sciences', 'note_physique', 
+                    'note_langues', 'note_philo']
+    for col in numeric_cols:
+        df[col] = pd.to_numeric(df[col])
 
     df = df[columns]
     prediction = model.predict(df)[0]

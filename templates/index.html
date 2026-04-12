@@ -1,95 +1,795 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orientation Académique</title>
-    <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrientAI — Intelligence d'Orientation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#0a0a0f;
+  --ink2:#13131a;
+  --ink3:#1c1c26;
+  --surface:#22222e;
+  --line:rgba(255,255,255,0.07);
+  --line2:rgba(255,255,255,0.12);
+  --cyan:#00e5ff;
+  --violet:#8b5cf6;
+  --emerald:#10b981;
+  --rose:#f43f5e;
+  --amber:#f59e0b;
+  --fg:#f0f0f5;
+  --fg2:#9090a8;
+  --fg3:#5a5a72;
+  --r:14px;
+  --r2:20px;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--ink);
+  color:var(--fg);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.5;
+}
+
+/* ── GLOW ORBS ── */
+.orb{position:fixed;border-radius:50%;pointer-events:none;filter:blur(120px);z-index:0}
+.orb-1{width:600px;height:600px;background:rgba(139,92,246,.12);top:-200px;right:-100px}
+.orb-2{width:500px;height:500px;background:rgba(0,229,255,.07);bottom:-100px;left:-150px}
+
+/* ── LAYOUT ── */
+.page{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 2rem 6rem}
+
+/* ── NAV ── */
+nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.8rem 0;
+  border-bottom:1px solid var(--line);
+  margin-bottom:5rem;
+}
+
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Syne',sans-serif;
+  font-size:1.25rem;font-weight:800;
+  letter-spacing:-.02em;
+}
+
+.nav-logo .dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 12px var(--cyan);
+  animation:blink 2.5s ease-in-out infinite;
+}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.nav-pill{
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line2);
+  border-radius:99px;
+  padding:6px 16px;
+  font-size:.75rem;
+  font-weight:500;
+  color:var(--fg2);
+  letter-spacing:.04em;
+}
+
+/* ── HERO ── */
+.hero{margin-bottom:4rem;max-width:720px}
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,229,255,.06);
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:99px;
+  padding:5px 14px;
+  font-size:.72rem;font-weight:500;
+  color:var(--cyan);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:1.5rem;
+}
+
+.hero-eyebrow span{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--cyan);
+  animation:blink 1.5s infinite;
+}
+
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.4rem,5vw,4rem);
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-.03em;
+  margin-bottom:1.2rem;
+}
+
+h1 .gradient{
+  background:linear-gradient(135deg,var(--cyan) 0%,var(--violet) 60%,var(--rose) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero p{
+  font-size:1.05rem;
+  color:var(--fg2);
+  line-height:1.7;
+  font-weight:300;
+  max-width:560px;
+}
+
+/* ── STATS ── */
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:var(--r2);
+  overflow:hidden;
+  margin-bottom:3rem;
+}
+
+.stat{
+  background:var(--ink2);
+  padding:1.5rem 2rem;
+  position:relative;
+  overflow:hidden;
+}
+
+.stat::after{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:0;
+  transition:opacity .3s;
+}
+
+.stat:hover::after{opacity:1}
+
+.stat-n{
+  font-family:'Syne',sans-serif;
+  font-size:2.2rem;font-weight:800;
+  color:var(--fg);
+  letter-spacing:-.03em;
+  line-height:1;
+  margin-bottom:.3rem;
+}
+
+.stat-n span{color:var(--cyan)}
+
+.stat-l{
+  font-size:.75rem;color:var(--fg3);
+  font-weight:400;letter-spacing:.03em;
+  text-transform:uppercase;
+}
+
+/* ── DASHBOARD GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+}
+
+.col-full{grid-column:1/-1}
+
+/* ── CARDS ── */
+.card{
+  background:var(--ink2);
+  border:1px solid var(--line);
+  border-radius:var(--r2);
+  padding:1.8rem;
+  transition:border-color .25s;
+}
+
+.card:hover{border-color:var(--line2)}
+
+.card-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:1.6rem;
+}
+
+.card-icon{
+  width:32px;height:32px;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;
+}
+
+.card-head h2{
+  font-family:'Syne',sans-serif;
+  font-size:.8rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg2);
+}
+
+/* ── FORM ELEMENTS ── */
+.field{margin-bottom:1.1rem}
+.field:last-child{margin-bottom:0}
+
+label{
+  display:block;
+  font-size:.72rem;font-weight:500;
+  color:var(--fg3);
+  letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:.5rem;
+}
+
+select,input[type=number]{
+  width:100%;
+  background:var(--ink3);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:11px 14px;
+  color:var(--fg);
+  font-family:'DM Sans',sans-serif;
+  font-size:.9rem;
+  outline:none;
+  appearance:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+
+select:focus,input[type=number]:focus{
+  border-color:rgba(0,229,255,.4);
+  box-shadow:0 0 0 3px rgba(0,229,255,.08);
+}
+
+select option{background:var(--ink2)}
+
+/* ── SLIDERS ── */
+.sliders{display:flex;flex-direction:column;gap:.9rem}
+
+.slider-row{
+  display:grid;
+  grid-template-columns:110px 1fr 36px;
+  align-items:center;gap:12px;
+}
+
+.slider-name{
+  font-size:.82rem;color:var(--fg2);font-weight:400;
+}
+
+input[type=range]{
+  appearance:none;-webkit-appearance:none;
+  width:100%;height:5px;
+  background:var(--ink3);
+  border:none;border-radius:99px;
+  outline:none;padding:0;
+  cursor:pointer;
+}
+
+input[type=range]::-webkit-slider-runnable-track{
+  height:5px;border-radius:99px;
+  background:linear-gradient(90deg,var(--cyan) var(--pct,70%),var(--ink3) var(--pct,70%));
+}
+
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 0 2px var(--cyan),0 0 12px rgba(0,229,255,.5);
+  cursor:pointer;
+  transition:transform .15s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+
+.slider-val{
+  font-family:'Syne',sans-serif;
+  font-size:.85rem;font-weight:700;
+  color:var(--cyan);text-align:right;
+}
+
+/* ── RADAR ── */
+.radar-wrap{
+  position:relative;height:250px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── SUBMIT ── */
+.btn{
+  width:100%;margin-top:1.5rem;
+  padding:15px 24px;
+  background:linear-gradient(135deg,var(--violet),var(--cyan));
+  border:none;border-radius:12px;
+  color:#fff;
+  font-family:'Syne',sans-serif;
+  font-size:.95rem;font-weight:700;
+  letter-spacing:.02em;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:opacity .2s,transform .15s;
+}
+
+.btn::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+  opacity:0;transition:opacity .2s;
+}
+
+.btn:hover{opacity:.92;transform:translateY(-1px)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+
+/* ── LOADING ── */
+.loader{
+  display:none;
+  align-items:center;justify-content:center;
+  gap:6px;padding:1rem 0;
+}
+
+.loader-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--cyan);
+  animation:ld .9s ease-in-out infinite;
+}
+
+.loader-dot:nth-child(2){animation-delay:.15s;background:var(--violet)}
+.loader-dot:nth-child(3){animation-delay:.3s;background:var(--rose)}
+
+@keyframes ld{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-7px);opacity:1}}
+
+/* ── RESULT ── */
+.result{
+  display:none;
+  grid-column:1/-1;
+  border-radius:var(--r2);
+  overflow:hidden;
+  animation:fadeUp .5s ease;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.result-top{
+  background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(0,229,255,.1));
+  border:1px solid rgba(139,92,246,.3);
+  border-bottom:none;
+  border-radius:var(--r2) var(--r2) 0 0;
+  padding:2.5rem;
+  text-align:center;
+}
+
+.result-eyebrow{
+  font-size:.7rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--fg3);margin-bottom:.8rem;
+}
+
+.result-name{
+  font-family:'Syne',sans-serif;
+  font-size:3rem;font-weight:800;
+  letter-spacing:-.03em;
+  background:linear-gradient(135deg,#fff 0%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:.8rem;
+}
+
+.result-desc{
+  font-size:.9rem;color:var(--fg2);
+  line-height:1.7;font-weight:300;
+  max-width:500px;margin:0 auto;
+}
+
+.result-bottom{
+  background:var(--ink2);
+  border:1px solid var(--line);
+  border-top:none;
+  border-radius:0 0 var(--r2) var(--r2);
+  padding:1.8rem 2.5rem;
+}
+
+.result-bottom h3{
+  font-size:.7rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--fg3);margin-bottom:1rem;
+}
+
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+
+.tag{
+  background:var(--ink3);
+  border:1px solid var(--line2);
+  border-radius:99px;
+  padding:6px 16px;
+  font-size:.8rem;color:var(--fg2);
+  font-weight:400;
+  transition:border-color .2s,color .2s;
+}
+
+.tag:hover{border-color:rgba(0,229,255,.4);color:var(--cyan)}
+
+/* ── CONFIDENCE BARS ── */
+.conf-bars{display:flex;flex-direction:column;gap:.7rem}
+
+.conf-row{display:flex;align-items:center;gap:12px}
+
+.conf-label{font-size:.78rem;color:var(--fg2);width:110px;flex-shrink:0}
+
+.conf-track{
+  flex:1;height:5px;
+  background:var(--ink3);
+  border-radius:99px;overflow:hidden;
+}
+
+.conf-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--violet),var(--cyan));
+  width:0;transition:width 1s ease;
+}
+
+.conf-pct{
+  font-size:.75rem;font-weight:600;
+  color:var(--fg3);width:34px;text-align:right;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Système d'Orientation</h1>
-        <p class="subtitle">Remplis ton profil pour découvrir ta carrière idéale</p>
 
-        <form id="form">
-            <div class="field">
-                <label>Genre</label>
-                <select name="Gender">
-                    <option value="Male">Homme</option>
-                    <option value="Female">Femme</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Âge</label>
-                <input type="number" name="Age" min="18" max="30" placeholder="ex: 21" required>
-            </div>
-            <div class="field">
-                <label>GPA</label>
-                <input type="number" name="GPA" step="0.1" min="0" max="4" placeholder="ex: 3.5" required>
-            </div>
-             <div class="field">
-                 <label>Spécialité (Major)</label>
-                 <select name="Major">
-                     <option value="Computer Science">Computer Science</option>
-                 </select>
-             </div>
-            <div class="field">
-                <label>Domaine d'intérêt</label>
-                <select name="Interested Domain">
-                    <option value="Web Development">Web Development</option>
-                    <option value="Data Science">Data Science</option>
-                    <option value="Artificial Intelligence">Artificial Intelligence</option>
-                    <option value="Cybersecurity">Cybersecurity</option>
-                    <option value="Cloud Computing">Cloud Computing</option>
-                    <option value="Mobile App Development">Mobile App Development</option>
-                    <option value="Game Development">Game Development</option>
-                    <option value="Blockchain Technology">Blockchain Technology</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Projets réalisés</label>
-                <select name="Projects">
-                    <option value="Chatbot Development">Chatbot Development</option>
-                    <option value="Data Analytics">Data Analytics</option>
-                    <option value="E-commerce Website">E-commerce Website</option>
-                    <option value="Full-Stack Web App">Full-Stack Web App</option>
-                    <option value="Network Security">Network Security</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Python</label>
-                <select name="Python">
-                    <option value="Strong">Fort</option>
-                    <option value="Average">Moyen</option>
-                    <option value="Weak">Faible</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>SQL</label>
-                <select name="SQL">
-                    <option value="Strong">Fort</option>
-                    <option value="Average">Moyen</option>
-                    <option value="Weak">Faible</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Java</label>
-                <select name="Java">
-                    <option value="Strong">Fort</option>
-                    <option value="Average">Moyen</option>
-                    <option value="Weak">Faible</option>
-                </select>
-            </div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
 
-            <button type="submit">Prédire ma carrière</button>
-        </form>
+<div class="page">
 
-        <div id="result" class="result hidden">
-            <h2>Carrière recommandée :</h2>
-            <p id="career"></p>
-        </div>
+  <nav>
+    <div class="nav-logo">
+      <div class="dot"></div>
+      OrientAI
+    </div>
+    <div class="nav-pill">EMSI · IA & DATA · 2025–2026</div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow"><span></span>Système ML d'orientation</div>
+    <h1>Découvrez votre<br><span class="gradient">avenir académique</span><br>guidé par l'IA</h1>
+    <p>Renseignez votre profil scolaire. Notre modèle Random Forest entraîné sur 3 000 profils d'étudiants analyse vos données et prédit la filière qui vous correspond le mieux.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-n">96<span>%</span></div>
+      <div class="stat-l">Précision du modèle</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">8<span></span></div>
+      <div class="stat-l">Filières couvertes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">3K<span>+</span></div>
+      <div class="stat-l">Profils analysés</div>
+    </div>
+  </div>
+
+  <form id="form">
+  <div class="grid">
+
+    <!-- Profil -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon" style="background:rgba(0,229,255,.1)">🎓</div>
+        <h2>Profil étudiant</h2>
+      </div>
+      <div class="field">
+        <label>Filière Bac</label>
+        <select name="filiere_bac">
+          <option value="SVT">Sciences de la Vie et de la Terre (SVT)</option>
+          <option value="PC">Physique-Chimie (PC)</option>
+          <option value="STM">Sciences et Technologies Mécaniques (STM)</option>
+          <option value="Lettres">Lettres et Sciences Humaines</option>
+          <option value="Economie">Sciences Économiques</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Niveau actuel</label>
+        <select name="niveau">
+          <option value="Lycée">Lycée (Terminale)</option>
+          <option value="Université">Université (1ère année)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Centre d'intérêt principal</label>
+        <select name="interet_principal">
+          <optgroup label="Technologie">
+            <option value="Technologie">Technologie générale</option>
+            <option value="Programmation">Programmation & Dev</option>
+            <option value="Jeux vidéo">Jeux vidéo & eSport</option>
+          </optgroup>
+          <optgroup label="Sciences">
+            <option value="Biologie">Biologie & Génétique</option>
+            <option value="Santé">Santé & Médecine</option>
+            <option value="Sciences">Sciences fondamentales</option>
+          </optgroup>
+          <optgroup label="Business">
+            <option value="Business">Business & Entreprise</option>
+            <option value="Finance">Finance & Bourse</option>
+            <option value="Marketing">Marketing & Pub</option>
+          </optgroup>
+          <optgroup label="Ingénierie">
+            <option value="Mécanique">Mécanique & Auto</option>
+            <option value="Construction">Construction & BTP</option>
+          </optgroup>
+          <optgroup label="Droit & Société">
+            <option value="Justice">Justice & Droit</option>
+            <option value="Politique">Politique</option>
+            <option value="Histoire">Histoire & Civilisations</option>
+          </optgroup>
+          <optgroup label="Arts & Design">
+            <option value="Art">Beaux-Arts</option>
+            <option value="Design">Design & UX</option>
+          </optgroup>
+          <optgroup label="Lettres">
+            <option value="Littérature">Littérature</option>
+            <option value="Voyage">Voyage & Cultures</option>
+            <option value="Culture">Culture & Médias</option>
+          </optgroup>
+          <optgroup label="Sciences humaines">
+            <option value="Sciences humaines">Sciences humaines</option>
+            <option value="Philosophie">Philosophie</option>
+          </optgroup>
+        </select>
+      </div>
     </div>
 
-    <script src="/static/script.js"></script>
+    <!-- Radar -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon" style="background:rgba(139,92,246,.1)">📊</div>
+        <h2>Profil de compétences</h2>
+      </div>
+      <div class="radar-wrap">
+        <canvas id="radar"></canvas>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="card col-full">
+      <div class="card-head">
+        <div class="card-icon" style="background:rgba(16,185,129,.1)">📝</div>
+        <h2>Notes sur 20</h2>
+      </div>
+      <div class="sliders">
+        <div class="slider-row">
+          <span class="slider-name">Mathématiques</span>
+          <input type="range" name="note_maths" min="0" max="20" step=".5" value="14" oninput="sync(this,'vm')">
+          <span class="slider-val" id="vm">14</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Sciences</span>
+          <input type="range" name="note_sciences" min="0" max="20" step=".5" value="14" oninput="sync(this,'vs')">
+          <span class="slider-val" id="vs">14</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Physique</span>
+          <input type="range" name="note_physique" min="0" max="20" step=".5" value="14" oninput="sync(this,'vp')">
+          <span class="slider-val" id="vp">14</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Langues</span>
+          <input type="range" name="note_langues" min="0" max="20" step=".5" value="14" oninput="sync(this,'vl')">
+          <span class="slider-val" id="vl">14</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Philosophie</span>
+          <input type="range" name="note_philo" min="0" max="20" step=".5" value="14" oninput="sync(this,'vph')">
+          <span class="slider-val" id="vph">14</span>
+        </div>
+      </div>
+      <button type="submit" class="btn">Analyser mon profil avec l'IA →</button>
+      <div class="loader" id="loader">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result" id="result">
+      <div class="result-top">
+        <div class="result-eyebrow">Orientation recommandée par l'IA</div>
+        <div class="result-name" id="r-name"></div>
+        <div class="result-desc" id="r-desc"></div>
+      </div>
+      <div class="result-bottom">
+        <h3>Formations recommandées</h3>
+        <div class="tags" id="r-tags"></div>
+      </div>
+    </div>
+
+    <!-- Confidence -->
+    <div class="card col-full" id="conf-card" style="display:none">
+      <div class="card-head">
+        <div class="card-icon" style="background:rgba(244,63,94,.1)">🎯</div>
+        <h2>Filières les plus proches de ton profil</h2>
+      </div>
+      <div class="conf-bars" id="conf-bars"></div>
+    </div>
+
+  </div>
+  </form>
+</div>
+
+<script>
+const DATA = {
+  formations:{
+    'Informatique':['Développement Web','Data Science','Cybersécurité','Intelligence Artificielle','Cloud Computing','DevOps'],
+    'Médecine':['Médecine générale','Pharmacie','Biologie médicale','Chirurgie dentaire','Sciences infirmières'],
+    'Commerce':['Marketing digital','Finance d\'entreprise','Gestion & Management','Commerce international','Audit & Comptabilité'],
+    'Ingénierie':['Génie civil','Génie mécanique','Génie électrique','Génie industriel','Génie informatique'],
+    'Droit':['Droit privé','Droit public','Droit des affaires','Sciences politiques','Relations internationales'],
+    'Architecture':['Architecture','Urbanisme & aménagement','Design intérieur','Génie civil','Arts plastiques'],
+    'Langues':['Langues étrangères appliquées','Traduction & interprétariat','Linguistique','Lettres modernes','Communication'],
+    'Psychologie':['Psychologie clinique','Sciences de l\'éducation','Travail social','Philosophie','Sociologie']
+  },
+  descriptions:{
+    'Informatique':'Ton profil analytique et tes aptitudes en sciences exactes te positionnent idéalement pour façonner le monde numérique de demain.',
+    'Médecine':'Tes excellentes bases scientifiques et ta passion pour la vie humaine font de toi un futur professionnel de santé accompli.',
+    'Commerce':'Ton aisance en langues et ta logique économique sont les fondations d\'une carrière brillante dans le monde des affaires.',
+    'Ingénierie':'Ton excellence en physique et mathématiques t\'ouvre les portes des grandes écoles d\'ingénieurs les plus prestigieuses.',
+    'Droit':'Ta maîtrise du langage, ton sens critique et ton intérêt pour la justice te destinent à une carrière juridique remarquable.',
+    'Architecture':'Ton mélange unique de rigueur scientifique et de sensibilité artistique est la signature rare d\'un futur grand architecte.',
+    'Langues':'Ta passion pour la communication interculturelle et les langues du monde est un atout inestimable dans un marché globalisé.',
+    'Psychologie':'Ta profonde sensibilité humaine et ton goût pour la philosophie te destinent à aider et comprendre les autres.'
+  },
+  all:['Informatique','Médecine','Commerce','Ingénierie','Droit','Architecture','Langues','Psychologie']
+};
+
+// Radar
+const rCtx = document.getElementById('radar').getContext('2d');
+const radar = new Chart(rCtx,{
+  type:'radar',
+  data:{
+    labels:['Maths','Sciences','Physique','Langues','Philo'],
+    datasets:[{
+      data:[14,14,14,14,14],
+      backgroundColor:'rgba(139,92,246,.15)',
+      borderColor:'rgba(139,92,246,.7)',
+      borderWidth:2,
+      pointBackgroundColor:'#8b5cf6',
+      pointBorderColor:'rgba(139,92,246,.5)',
+      pointRadius:5
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{r:{
+      min:0,max:20,
+      ticks:{display:false,stepSize:5},
+      grid:{color:'rgba(255,255,255,.06)'},
+      angleLines:{color:'rgba(255,255,255,.06)'},
+      pointLabels:{color:'#9090a8',font:{size:11,family:'DM Sans'}}
+    }}
+  }
+});
+
+function sync(el,id){
+  const v=parseFloat(el.value);
+  document.getElementById(id).textContent=v;
+  const pct=(v/20*100)+'%';
+  el.style.setProperty('--pct',pct);
+  updateRadar();
+}
+
+function updateRadar(){
+  const keys=['note_maths','note_sciences','note_physique','note_langues','note_philo'];
+  radar.data.datasets[0].data=keys.map(k=>parseFloat(document.querySelector(`[name="${k}"]`).value));
+  radar.update('none');
+}
+
+// Init slider tracks
+document.querySelectorAll('input[type=range]').forEach(el=>{
+  el.style.setProperty('--pct',(parseFloat(el.value)/20*100)+'%');
+});
+
+// Submit
+document.getElementById('form').addEventListener('submit',async function(e){
+  e.preventDefault();
+  document.getElementById('loader').style.display='flex';
+  document.getElementById('result').style.display='none';
+  document.getElementById('conf-card').style.display='none';
+
+  const fd=new FormData(this);
+  const data={};
+  fd.forEach((v,k)=>data[k]=v);
+
+  try{
+    const res=await fetch('/predict',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    const json=await res.json();
+    const ori=json.orientation;
+
+    setTimeout(()=>{
+      document.getElementById('loader').style.display='none';
+
+      // Result
+      document.getElementById('r-name').textContent=ori;
+      document.getElementById('r-desc').textContent=DATA.descriptions[ori]||'';
+      const tagsEl=document.getElementById('r-tags');
+      tagsEl.innerHTML='';
+      (DATA.formations[ori]||[]).forEach(f=>{
+        const t=document.createElement('span');
+        t.className='tag';t.textContent=f;
+        tagsEl.appendChild(t);
+      });
+      document.getElementById('result').style.display='block';
+
+      // Confidence bars (simulated from notes profile)
+      const notes=[
+        parseFloat(document.querySelector('[name=note_maths]').value),
+        parseFloat(document.querySelector('[name=note_sciences]').value),
+        parseFloat(document.querySelector('[name=note_physique]').value),
+        parseFloat(document.querySelector('[name=note_langues]').value),
+        parseFloat(document.querySelector('[name=note_philo]').value)
+      ];
+      const avg=notes.reduce((a,b)=>a+b,0)/notes.length;
+
+      const scores={
+        'Informatique': (notes[0]*2+notes[2]+notes[1])/4,
+        'Médecine':     (notes[1]*2+notes[0]+notes[2])/4,
+        'Commerce':     (notes[3]*2+notes[0]+notes[4])/4,
+        'Ingénierie':   (notes[2]*2+notes[0]+notes[1])/4,
+        'Droit':        (notes[4]*2+notes[3]+notes[0])/4,
+        'Architecture': (notes[0]+notes[2]+notes[3]+notes[1])/4,
+        'Langues':      (notes[3]*3+notes[4])/4,
+        'Psychologie':  (notes[4]*2+notes[1]+notes[3])/4
+      };
+
+      // Boost predicted
+      scores[ori]=Math.max(scores[ori],19);
+
+      const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      const max=sorted[0][1];
+
+      const barsEl=document.getElementById('conf-bars');
+      barsEl.innerHTML='';
+      sorted.forEach(([name,score])=>{
+        const pct=Math.round(score/max*100);
+        barsEl.innerHTML+=`
+          <div class="conf-row">
+            <span class="conf-label">${name}</span>
+            <div class="conf-track"><div class="conf-fill" data-w="${pct}"></div></div>
+            <span class="conf-pct">${pct}%</span>
+          </div>`;
+      });
+
+      document.getElementById('conf-card').style.display='block';
+      setTimeout(()=>{
+        document.querySelectorAll('.conf-fill').forEach(el=>{
+          el.style.width=el.dataset.w+'%';
+        });
+      },100);
+
+      document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+    },1400);
+
+  }catch(err){
+    document.getElementById('loader').style.display='none';
+    console.error(err);
+  }
+});
+</script>
 </body>
 </html>
