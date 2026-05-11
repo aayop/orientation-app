@@ -1,0 +1,682 @@
+\documentclass[12pt,a4paper]{report}
+
+%========================
+% PACKAGES
+%========================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{float}
+
+%========================
+% PAGE SETTINGS
+%========================
+\geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+\setstretch{1.2}
+\setlength{\parindent}{0pt}
+
+%========================
+% COLORS
+%========================
+\definecolor{mainblue}{RGB}{25, 70, 140}
+\definecolor{lightblue}{RGB}{230, 240, 250}
+\definecolor{graytext}{RGB}{70, 70, 70}
+
+%========================
+% HYPERREF
+%========================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=mainblue,
+    urlcolor=mainblue,
+    pdftitle={Cahier des Charges - OrientAI},
+    pdfauthor={Bourakkadi Yosur / Elmardi Ayoub}
+}
+
+%========================
+% TITLES
+%========================
+\titleformat{\chapter}
+{\normalfont\Huge\bfseries\color{mainblue}}
+{\thechapter}{1em}{}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries\color{mainblue}}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries\color{graytext}}
+{\thesubsection}{1em}{}
+
+%========================
+% HEADER / FOOTER
+%========================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{mainblue}{Cahier des Charges}}
+\fancyhead[R]{\textcolor{mainblue}{OrientAI}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+%========================
+% CUSTOM BOX
+%========================
+\newtcolorbox{mybox}{
+    colback=lightblue,
+    colframe=mainblue,
+    arc=2mm,
+    boxrule=0.6pt
+}
+
+%========================
+% DOCUMENT
+%========================
+\begin{document}
+
+%========================
+% COVER PAGE
+%========================
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge\bfseries\color{mainblue} Cahier des Charges\par}
+    \vspace{0.7cm}
+    {\LARGE\bfseries OrientAI\\[0.2cm] Système Intelligent d'Orientation Académique\par}
+    
+    \vspace{1.5cm}
+    
+    \begin{mybox}
+    \centering
+    \textbf{Application web de recommandation d'orientation basée sur Python, Flask et le Machine Learning}
+    \end{mybox}
+    
+    \vspace{2cm}
+    
+    \begin{flushleft}
+    \textbf{Réalisé par :} Bourakkadi Yosur / Elmardi Ayoub \\
+    \textbf{Niveau :} 4\textsuperscript{ème} année / IA \& DATA \\
+    \textbf{Établissement :} EMSI \\
+    \textbf{Année universitaire :} 2025 - 2026 \\
+    \textbf{Encadrant :} À compléter
+    \end{flushleft}
+    
+    \vfill
+    
+    {\large \today \par}
+\end{titlepage}
+
+%========================
+% TOC
+%========================
+\tableofcontents
+\newpage
+
+%========================
+% INTRODUCTION
+%========================
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+L'orientation académique est une étape déterminante dans le parcours d'un étudiant. Pourtant, ce choix est souvent influencé par l'entourage, par une perception incomplète des filières ou par une mauvaise appréciation des compétences réelles de l'élève.
+
+Dans ce contexte, le projet \textbf{OrientAI} vise à proposer un outil d'aide à la décision capable d'analyser le profil scolaire d'un étudiant et de recommander automatiquement une orientation adaptée. L'application exploite un ensemble de données structurées, un modèle de classification supervisée ainsi qu'une interface web simple permettant à l'utilisateur de renseigner ses informations et d'obtenir un résultat immédiat.
+
+Ce cahier des charges présente le cadre du projet, son objectif, son fonctionnement, les contraintes techniques, les besoins fonctionnels et non fonctionnels, ainsi que les livrables attendus.
+
+%========================
+% CHAPTER 1
+%========================
+\chapter{Présentation Générale du Projet}
+
+\section{Intitulé du projet}
+\textbf{OrientAI} est une application web d'orientation académique qui prédit la filière ou le domaine d'études le plus cohérent avec le profil d'un étudiant.
+
+\section{Description synthétique}
+Le projet développé dans \texttt{orientation-app} repose sur trois composants principaux :
+\begin{itemize}[label=--]
+    \item une \textbf{application web Flask} pour la saisie et l'affichage des résultats ;
+    \item un \textbf{modèle de machine learning} entraîné hors ligne puis chargé dans l'application ;
+    \item un \textbf{dataset d'étudiants marocains simulés} utilisé pour l'entraînement et l'évaluation initiale.
+\end{itemize}
+
+L'utilisateur renseigne sa filière du baccalauréat, son niveau, son centre d'intérêt principal ainsi que ses notes dans plusieurs matières. Le système traite ces informations, les encode, puis interroge un modèle \textit{Random Forest} pour produire une orientation recommandée.
+
+\section{Valeur ajoutée}
+La valeur ajoutée du projet est de transformer des informations simples à fournir par l'utilisateur en une recommandation claire, rapide et exploitable. L'application apporte :
+\begin{itemize}[label=--]
+    \item une aide à la décision plus structurée qu'un simple conseil subjectif ;
+    \item une restitution instantanée sous forme d'orientation recommandée ;
+    \item une proposition de parcours ou formations associées ;
+    \item une base technique évolutive pouvant intégrer des données réelles à l'avenir.
+\end{itemize}
+
+%========================
+% CHAPTER 2
+%========================
+\chapter{Contexte et Problématique}
+
+Le choix d'une filière reste difficile pour de nombreux élèves et étudiants, notamment lorsqu'ils hésitent entre plusieurs domaines comme l'informatique, la médecine, le commerce, l'ingénierie ou les sciences humaines. Les outils classiques d'orientation sont souvent trop génériques, peu personnalisés ou peu transparents.
+
+Le projet répond donc à la problématique suivante :
+
+\begin{mybox}
+Comment concevoir une application web capable d'exploiter le profil scolaire d'un étudiant afin de recommander automatiquement une orientation académique pertinente et compréhensible ?
+\end{mybox}
+
+Cette problématique se décline en plusieurs enjeux :
+\begin{itemize}[label=--]
+    \item structurer des données représentatives du profil étudiant ;
+    \item choisir des variables pertinentes pour la prédiction ;
+    \item entraîner un modèle suffisamment fiable ;
+    \item intégrer le modèle dans une application accessible ;
+    \item présenter le résultat sous une forme claire et utile.
+\end{itemize}
+
+%========================
+% CHAPTER 3
+%========================
+\chapter{Étude de l'Existant}
+
+\section{Solutions classiques d'orientation}
+L'orientation scolaire est généralement réalisée à travers des entretiens avec des conseillers, des questionnaires d'intérêt, des salons étudiants ou des plateformes d'information sur les filières. Ces méthodes sont utiles, mais elles présentent plusieurs limites :
+\begin{itemize}[label=--]
+    \item elles reposent souvent sur une analyse manuelle et subjective ;
+    \item elles ne prennent pas toujours en compte simultanément les notes, les intérêts et la filière d'origine ;
+    \item elles donnent parfois des conseils généraux sans score de confiance ;
+    \item elles ne permettent pas toujours de comparer rapidement plusieurs orientations proches.
+\end{itemize}
+
+\section{Plateformes numériques existantes}
+Certaines plateformes proposent des tests d'orientation en ligne. Elles fonctionnent souvent avec des questionnaires de personnalité ou des règles prédéfinies. Cependant, ces outils ne sont pas toujours adaptés au contexte académique marocain et ne s'appuient pas forcément sur un modèle prédictif entraîné à partir de profils structurés.
+
+\section{Positionnement d'OrientAI}
+OrientAI se positionne comme un prototype d'aide à la décision basé sur le machine learning. L'objectif n'est pas de remplacer un conseiller d'orientation, mais de fournir une première analyse automatisée et cohérente à partir de données simples :
+\begin{itemize}[label=--]
+    \item filière du baccalauréat ;
+    \item notes principales ;
+    \item niveau actuel ;
+    \item centre d'intérêt dominant.
+\end{itemize}
+
+La différence principale avec un simple questionnaire est que le système apprend des relations entre les variables et les orientations à partir d'un dataset, puis utilise ce modèle pour prédire une orientation probable.
+
+%========================
+% CHAPTER 4
+%========================
+\chapter{Objectifs du Projet}
+
+\section{Objectif principal}
+Concevoir une application web intelligente capable de prédire l'orientation académique la plus adaptée à un étudiant à partir de ses notes, de sa filière d'origine, de son niveau et de son centre d'intérêt principal.
+
+\section{Objectifs spécifiques}
+Le projet vise également à :
+\begin{itemize}[label=--]
+    \item générer et exploiter un dataset cohérent avec le contexte visé ;
+    \item entraîner un modèle de classification supervisée ;
+    \item sérialiser le modèle et les encodeurs pour réutilisation ;
+    \item mettre à disposition une interface web moderne et intuitive ;
+    \item afficher des suggestions de formations liées à l'orientation prédite ;
+    \item préparer une base de travail exploitable dans un contexte académique ou démonstratif.
+\end{itemize}
+
+%========================
+% CHAPTER 5
+%========================
+\chapter{Périmètre Fonctionnel}
+
+\section{Utilisateurs cibles}
+Le système s'adresse principalement :
+\begin{itemize}[label=--]
+    \item aux lycéens préparant leur orientation post-bac ;
+    \item aux étudiants en début de parcours souhaitant réévaluer leur choix ;
+    \item aux encadrants pédagogiques dans un cadre de démonstration ou d'accompagnement.
+\end{itemize}
+
+\section{Fonctionnalités incluses}
+La version actuelle du projet couvre les fonctionnalités suivantes :
+\begin{itemize}[label=--]
+    \item formulaire de saisie du profil étudiant ;
+    \item envoi des données au serveur via une requête HTTP ;
+    \item prétraitement et encodage des variables ;
+    \item prédiction automatique de l'orientation ;
+    \item affichage de la recommandation finale ;
+    \item affichage de suggestions de formations par domaine ;
+    \item visualisation synthétique du profil utilisateur dans l'interface.
+\end{itemize}
+
+\section{Fonctionnalités hors périmètre}
+Dans cette version, les éléments suivants ne sont pas encore pris en charge :
+\begin{itemize}[label=--]
+    \item authentification des utilisateurs ;
+    \item sauvegarde d'historique en base de données ;
+    \item apprentissage continu à partir des retours utilisateurs ;
+    \item exploitation de données réelles institutionnelles ;
+    \item déploiement cloud ou mobile natif.
+\end{itemize}
+
+%========================
+% CHAPTER 6
+%========================
+\chapter{Description du Système}
+
+\section{Principe de fonctionnement}
+Le système fonctionne selon le scénario suivant :
+\begin{enumerate}[label=\arabic*.]
+    \item l'utilisateur accède à l'interface web ;
+    \item il renseigne sa filière bac, son niveau, son centre d'intérêt et ses notes ;
+    \item l'application envoie les données au point d'entrée \texttt{/predict} ;
+    \item le serveur charge le modèle, les colonnes attendues et les encodeurs ;
+    \item les données sont converties dans le format d'entrée du modèle ;
+    \item le modèle calcule l'orientation prédite ;
+    \item le résultat est retourné puis affiché avec des parcours suggérés.
+\end{enumerate}
+
+\section{Orientations actuellement couvertes}
+Le modèle distingue actuellement les domaines suivants :
+\begin{itemize}[label=--]
+    \item Informatique ;
+    \item Médecine ;
+    \item Commerce ;
+    \item Ingénierie ;
+    \item Droit ;
+    \item Architecture ;
+    \item Langues ;
+    \item Psychologie.
+\end{itemize}
+
+\section{Exemple de sortie}
+\begin{mybox}
+Orientation recommandée : \textbf{Informatique} \\[0.2cm]
+Exemples de formations suggérées : \textbf{Développement Web, Data Science, Cybersécurité, Intelligence Artificielle, Cloud Computing}
+\end{mybox}
+
+%========================
+% CHAPTER 7
+%========================
+\chapter{Architecture Technique}
+
+\section{Composants du projet}
+Le projet est structuré autour des fichiers suivants :
+\begin{itemize}[label=--]
+    \item \texttt{app.py} : application Flask et route de prédiction ;
+    \item \texttt{train\_model.py} : script d'entraînement du modèle ;
+    \item \texttt{generate\_dataset.py} : génération du dataset synthétique ;
+    \item \texttt{model.pkl} : modèle entraîné sérialisé ;
+    \item \texttt{columns.pkl} : ordre des variables attendu par le modèle ;
+    \item \texttt{encoders.pkl} : encodeurs des variables catégorielles ;
+    \item \texttt{templates/index.html} : interface utilisateur principale ;
+    \item \texttt{moroccan\_students.csv} : dataset d'entraînement.
+\end{itemize}
+
+\section{Architecture logique}
+\begin{figure}[H]
+\centering
+\begin{tcolorbox}[colback=white,colframe=mainblue,width=0.95\textwidth]
+\centering
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{c}
+\textbf{Utilisateur} \\
+$\downarrow$ \\
+\textbf{Interface Web} : formulaire, sliders de notes, affichage du résultat \\
+$\downarrow$ \\
+\textbf{Route Flask \texttt{/predict}} : réception des données JSON \\
+$\downarrow$ \\
+\textbf{Prétraitement} : conversion numérique, normalisation des libellés, One-Hot Encoding \\
+$\downarrow$ \\
+\textbf{Modèle Random Forest} : prédiction + probabilités par orientation \\
+$\downarrow$ \\
+\textbf{Réponse JSON} : orientation, probabilités, cas ambigu ou profil à renforcer \\
+$\downarrow$ \\
+\textbf{Interface Web} : recommandation et filières les plus proches
+\end{tabular}
+\end{tcolorbox}
+\caption{Schéma de l'architecture logique d'OrientAI}
+\end{figure}
+
+\section{Architecture du projet}
+L'organisation du projet dans l'environnement de développement est la suivante :
+
+\begin{figure}[H]
+\centering
+\begin{tcolorbox}[colback=black!3,colframe=mainblue,width=0.95\textwidth]
+\small
+\begin{tabular}{l}
+\texttt{orientation-app/} \\
+\texttt{|-- .gitignore} \\
+\texttt{|-- app.py} \\
+\texttt{|-- generate\_dataset.py} \\
+\texttt{|-- train\_model.py} \\
+\texttt{|-- moroccan\_students.csv} \\
+\texttt{|-- model.pkl} \\
+\texttt{|-- columns.pkl} \\
+\texttt{|-- encoders.pkl} \\
+\texttt{|-- requirements.txt} \\
+\texttt{|-- README.md} \\
+\texttt{|-- static/} \\
+\texttt{| \ \ |-- script.js} \\
+\texttt{| \ \ `-- style.css} \\
+\texttt{`-- templates/} \\
+\texttt{\ \ \ \ |-- index.html} \\
+\texttt{\ \ \ \ `-- result.html}
+\end{tabular}
+\end{tcolorbox}
+\caption{Capture représentative de l'architecture du projet dans l'IDE}
+\end{figure}
+
+\section{Technologies utilisées}
+\begin{itemize}[label=--]
+    \item \textbf{Python} pour la logique applicative et l'entraînement ;
+    \item \textbf{Flask} pour l'application web ;
+    \item \textbf{pandas} pour la manipulation des données ;
+    \item \textbf{scikit-learn} pour l'entraînement du modèle ;
+    \item \textbf{joblib} pour la sérialisation ;
+    \item \textbf{HTML / CSS / JavaScript} pour l'interface utilisateur.
+\end{itemize}
+
+%========================
+% CHAPTER 8
+%========================
+\chapter{Données et Modélisation}
+
+\section{Nature des données}
+Le projet utilise un dataset nommé \texttt{moroccan\_students.csv} contenant \textbf{2000 profils} répartis de manière équilibrée entre les huit orientations couvertes.
+
+Chaque profil comporte notamment :
+\begin{itemize}[label=--]
+    \item la filière du baccalauréat ;
+    \item les notes en mathématiques, sciences, physique, langues et philosophie ;
+    \item l'intérêt principal ;
+    \item le niveau de l'apprenant ;
+    \item l'orientation cible.
+\end{itemize}
+
+\section{Origine des données}
+Dans la version actuelle, les données sont \textbf{générées de manière synthétique} via le script \texttt{generate\_dataset.py}. Cette approche permet de construire rapidement une base d'expérimentation cohérente, mais implique aussi que la solution devra être enrichie par des données réelles pour une mise en production.
+
+\section{Approche de modélisation}
+Le problème traité est un problème de \textbf{classification supervisée multiclasse}. Le script d'entraînement repose sur un modèle \textbf{Random Forest}, choisi pour :
+\begin{itemize}[label=--]
+    \item sa robustesse sur des variables mixtes ;
+    \item sa simplicité d'implémentation ;
+    \item sa bonne capacité de généralisation dans un prototype ;
+    \item sa compatibilité directe avec le pipeline actuel.
+\end{itemize}
+
+\section{Type de filtrage utilisé}
+Le projet ne repose pas sur un filtrage collaboratif. Le \textbf{filtrage collaboratif} est généralement utilisé dans les systèmes de recommandation où l'on exploite les comportements de plusieurs utilisateurs similaires, par exemple les notes données à des films ou les achats réalisés par des clients.
+
+Dans OrientAI, il n'existe pas d'historique d'utilisateurs, de votes ou d'interactions entre profils. Le système utilise plutôt une approche de \textbf{classification supervisée}. Chaque ligne du dataset contient un profil étudiant et une orientation cible. Le modèle apprend à associer les caractéristiques d'un profil à une classe d'orientation.
+
+On peut donc décrire le fonctionnement comme une \textbf{recommandation par classification supervisée basée sur le contenu du profil}. Les variables utilisées sont les notes, la filière bac, le niveau et l'intérêt principal.
+
+\section{Pipeline de traitement}
+\begin{enumerate}[label=\arabic*.]
+    \item génération ou chargement du dataset ;
+    \item encodage des variables catégorielles ;
+    \item séparation des jeux d'entraînement et de test ;
+    \item entraînement du modèle ;
+    \item évaluation des performances ;
+    \item sauvegarde du modèle et des artefacts ;
+    \item exploitation du modèle dans l'application web.
+\end{enumerate}
+
+%========================
+% CHAPTER 9
+%========================
+\chapter{Besoins Fonctionnels}
+
+Le système devra répondre aux besoins fonctionnels suivants :
+\begin{itemize}[label=--]
+    \item permettre la saisie d'un profil étudiant via une interface web ;
+    \item transmettre les données au serveur sans rechargement complexe ;
+    \item transformer les données dans le format attendu par le modèle ;
+    \item prédire automatiquement une orientation parmi les filières prises en charge ;
+    \item afficher le résultat de façon lisible et attractive ;
+    \item proposer des formations liées à l'orientation recommandée ;
+    \item permettre la réutilisation du modèle entraîné sans réentraînement systématique.
+\end{itemize}
+
+%========================
+% CHAPTER 10
+%========================
+\chapter{Besoins Non Fonctionnels}
+
+Le système devra également respecter les contraintes non fonctionnelles suivantes :
+\begin{itemize}[label=--]
+    \item \textbf{Performance :} la prédiction doit être quasi instantanée après soumission ;
+    \item \textbf{Ergonomie :} l'interface doit être simple, lisible et accessible ;
+    \item \textbf{Fiabilité :} les entrées doivent être correctement transformées avant prédiction ;
+    \item \textbf{Maintenabilité :} la structure du projet doit rester claire et modulaire ;
+    \item \textbf{Évolutivité :} le système doit pouvoir intégrer de nouvelles filières ou variables ;
+    \item \textbf{Portabilité :} l'application doit être exécutable localement dans un environnement Python standard ;
+    \item \textbf{Traçabilité académique :} les choix techniques doivent être explicitables dans un rapport de projet.
+\end{itemize}
+
+%========================
+% CHAPTER 11
+%========================
+\chapter{Évaluation et Indicateurs}
+
+L'évaluation du modèle pourra s'appuyer sur les métriques suivantes :
+\begin{itemize}[label=--]
+    \item accuracy ;
+    \item precision ;
+    \item recall ;
+    \item F1-score ;
+    \item matrice de confusion ;
+    \item analyse qualitative de la cohérence des recommandations.
+\end{itemize}
+
+Au-delà des performances quantitatives, une attention particulière devra être portée à la cohérence pédagogique des résultats retournés à l'utilisateur.
+
+\section{Résultats obtenus}
+Après amélioration du dataset, passage à un pipeline avec \texttt{OneHotEncoder} pour les variables catégorielles et entraînement du modèle Random Forest, les résultats obtenus sur le jeu de test sont les suivants :
+
+\begin{figure}[H]
+\centering
+\begin{tcolorbox}[colback=black!3,colframe=mainblue,width=0.95\textwidth]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Orientation} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & \textbf{Support} \\
+\midrule
+Architecture & 0.96 & 1.00 & 0.98 & 50 \\
+Commerce & 1.00 & 1.00 & 1.00 & 50 \\
+Droit & 0.96 & 0.96 & 0.96 & 50 \\
+Informatique & 0.94 & 0.94 & 0.94 & 50 \\
+Ingénierie & 0.94 & 0.88 & 0.91 & 50 \\
+Langues & 0.96 & 0.98 & 0.97 & 50 \\
+Médecine & 0.98 & 1.00 & 0.99 & 50 \\
+Psychologie & 1.00 & 0.98 & 0.99 & 50 \\
+\midrule
+\textbf{Accuracy} &  &  & \textbf{0.97} & 400 \\
+\textbf{Macro avg} & 0.97 & 0.97 & 0.97 & 400 \\
+\textbf{Weighted avg} & 0.97 & 0.97 & 0.97 & 400 \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+\caption{Rapport détaillé des métriques du modèle}
+\end{figure}
+
+L'accuracy globale est de \textbf{96.8\%}, arrondie à \textbf{97\%} dans l'interface. Le recall est élevé pour la majorité des classes. La classe \textit{Ingénierie} reste la plus difficile, avec un recall de 0.88, car elle partage des caractéristiques proches avec \textit{Informatique} et \textit{Architecture}.
+
+%========================
+% CHAPTER 12
+%========================
+\chapter{Propositions de Formations}
+
+Après la prédiction de l'orientation, le système doit proposer des pistes de formations cohérentes. Les recommandations actuellement prévues sont résumées ci-dessous.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{4cm} >{\raggedright\arraybackslash}p{9cm}}
+\toprule
+\textbf{Orientation prédite} & \textbf{Exemples de formations proposées} \\
+\midrule
+Informatique & Développement Web, Data Science, Cybersécurité, Intelligence Artificielle, Cloud Computing, DevOps \\
+Médecine & Médecine générale, Pharmacie, Biologie médicale, Chirurgie dentaire, Sciences infirmières \\
+Commerce & Marketing digital, Finance d'entreprise, Gestion et management, Commerce international, Audit et comptabilité \\
+Ingénierie & Génie civil, Génie mécanique, Génie électrique, Génie industriel, Génie informatique \\
+Droit & Droit privé, Droit public, Droit des affaires, Sciences politiques, Relations internationales \\
+Architecture & Architecture, Urbanisme, Design intérieur, Aménagement, Arts appliqués \\
+Langues & Langues étrangères appliquées, Traduction, Linguistique, Lettres modernes, Communication \\
+Psychologie & Psychologie clinique, Sciences de l'éducation, Travail social, Philosophie, Sociologie \\
+\bottomrule
+\end{longtable}
+
+%========================
+% CHAPTER 13
+%========================
+\chapter{Contraintes et Limites}
+
+Le projet comporte plusieurs limites qu'il convient de préciser dans une optique professionnelle :
+\begin{itemize}[label=--]
+    \item le dataset actuel est synthétique et non issu d'une collecte institutionnelle réelle ;
+    \item le système propose une aide à l'orientation et non une décision définitive ;
+    \item la prédiction dépend directement de la qualité des données saisies ;
+    \item les probabilités du modèle restent des indicateurs techniques et ne remplacent pas une analyse humaine ;
+    \item aucune persistance en base de données n'est intégrée dans la version actuelle.
+\end{itemize}
+
+Ces limites n'enlèvent pas l'intérêt du projet en tant que prototype fonctionnel, mais elles devront être prises en compte pour une version plus avancée.
+
+%========================
+% CHAPTER 14
+%========================
+\chapter{Planning Prévisionnel}
+
+Le planning prévisionnel du projet est présenté ci-dessous :
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|p{6.5cm}|c|c|c|c|}
+\hline
+\textbf{Tâches} & \textbf{S1} & \textbf{S2} & \textbf{S3} & \textbf{S4} \\
+\hline
+Analyse du besoin et cadrage du projet & X &   &   &   \\
+\hline
+Conception du dataset et génération des profils & X & X &   &   \\
+\hline
+Prétraitement des données et préparation des variables &   & X &   &   \\
+\hline
+Entraînement et évaluation du modèle Random Forest &   & X & X &   \\
+\hline
+Développement de l'application Flask &   &   & X & X \\
+\hline
+Intégration interface + prédiction + recommandations &   &   & X & X \\
+\hline
+Tests, corrections et amélioration de la présentation &   &   &   & X \\
+\hline
+Rédaction finale et soutenance &   &   &   & X \\
+\hline
+\end{tabular}
+\end{center}
+
+%========================
+% CHAPTER 15
+%========================
+\chapter{Livrables}
+
+À la fin du projet, les livrables attendus sont :
+\begin{itemize}[label=--]
+    \item le code source complet de l'application web ;
+    \item le script de génération du dataset ;
+    \item le script d'entraînement du modèle ;
+    \item le modèle entraîné et les fichiers sérialisés associés ;
+    \item le dataset utilisé pour les expérimentations ;
+    \item le cahier des charges ;
+    \item le rapport final de projet ;
+    \item la présentation de soutenance.
+\end{itemize}
+
+%========================
+% CHAPTER 16
+%========================
+\chapter{Perspectives d'Évolution}
+
+Le projet peut évoluer vers une version plus complète grâce aux améliorations suivantes :
+\begin{itemize}[label=--]
+    \item intégration de données réelles issues d'enquêtes ou d'établissements ;
+    \item ajout d'un module d'explication des prédictions ;
+    \item amélioration du module de détection des profils ambigus ;
+    \item ajout d'un espace administrateur et d'un historique des profils ;
+    \item déploiement sur une plateforme cloud pour une utilisation publique ;
+    \item enrichissement des recommandations par établissements, métiers et débouchés.
+\end{itemize}
+
+%========================
+% CHAPTER 17
+%========================
+\chapter{Difficultés Rencontrées Pendant le Développement}
+
+\section{Qualité du dataset}
+La difficulté principale a concerné la cohérence du dataset. Les premières versions contenaient des profils trop aléatoires : certaines orientations ne correspondaient pas suffisamment aux notes et aux centres d'intérêt. Par exemple, des profils faibles ou contradictoires pouvaient recevoir une orientation trop spécifique.
+
+Pour corriger ce problème, le dataset a été retravaillé afin de mieux séparer les profils :
+\begin{itemize}[label=--]
+    \item resserrement des écarts-types des notes ;
+    \item amélioration de la cohérence entre filière bac, notes et orientation ;
+    \item réduction du bruit artificiel ;
+    \item maintien d'une petite part d'irrégularité pour éviter un dataset trop parfait.
+\end{itemize}
+
+\section{Confusion entre certaines orientations}
+Certaines classes étaient naturellement proches. Les confusions les plus fréquentes concernaient :
+\begin{itemize}[label=--]
+    \item Informatique, Ingénierie et Architecture ;
+    \item Droit, Langues et Psychologie ;
+    \item Commerce et certains profils littéraires.
+\end{itemize}
+
+Ces confusions ont demandé plusieurs ajustements dans la génération des données et dans l'entraînement du modèle.
+
+\section{Encodage des variables catégorielles}
+Une difficulté importante a été le choix de l'encodage des variables textuelles. La première approche utilisait un encodage de type \texttt{LabelEncoder}, qui transforme chaque catégorie en nombre. Cette méthode peut introduire un ordre artificiel entre des catégories qui ne sont pas ordonnées, par exemple entre \textit{SVT}, \textit{PC}, \textit{Lettres} et \textit{Economie}.
+
+La solution retenue a été l'utilisation de \texttt{OneHotEncoder}, plus adaptée aux variables catégorielles. Cette amélioration a contribué à augmenter fortement les performances du modèle.
+
+\section{Prédictions incohérentes ou peu confiantes}
+Pendant les tests, certains profils moyens ou contradictoires recevaient une recommandation trop catégorique. Par exemple, un profil avec des notes moyennes et des signaux contradictoires pouvait être classé en Psychologie ou en Droit alors que les probabilités du modèle étaient faibles.
+
+Pour répondre à ce problème, deux mécanismes ont été ajoutés :
+\begin{itemize}[label=--]
+    \item \textbf{Profil à renforcer} lorsque la moyenne générale est inférieure à 10 ou lorsque trop de matières sont faibles ;
+    \item \textbf{Profil ambigu} lorsque la meilleure probabilité est trop faible ou trop proche de la deuxième orientation.
+\end{itemize}
+
+Cette évolution permet d'éviter de présenter une prédiction incertaine comme une recommandation définitive.
+
+\section{Affichage des métriques et cohérence de l'interface}
+L'interface affichait initialement une précision qui ne correspondait plus au modèle entraîné. Les textes visibles ont donc été mis à jour pour refléter les performances réelles, notamment l'accuracy arrondie à 97\% et le nombre réel de profils utilisés, soit 2000.
+
+Les barres de confiance ont également été corrigées. Elles étaient d'abord simulées côté JavaScript, puis ont été remplacées par les vraies probabilités retournées par le modèle via \texttt{predict\_proba}.
+
+\section{Gestion des caractères accentués}
+Le projet utilise des libellés en français contenant des accents, comme \textit{Médecine}, \textit{Ingénierie}, \textit{Lycée} ou \textit{Jeux vidéo}. Des problèmes d'encodage pouvaient apparaître entre le navigateur, le terminal et le modèle sauvegardé.
+
+Une normalisation des libellés a été ajoutée dans l'application afin de mieux gérer les accents, les espaces et les variantes de saisie.
+
+%========================
+% CHAPTER 18
+%========================
+\chapter{Conclusion}
+
+Le projet \textbf{OrientAI} constitue un prototype fonctionnel d'aide à l'orientation académique combinant \textbf{application web} et \textbf{machine learning}. Il permet de collecter un profil étudiant, de l'analyser automatiquement et de restituer une recommandation d'orientation accompagnée de pistes de formation.
+
+Ce projet présente un intérêt pédagogique fort, car il mobilise des compétences en data science, en développement web et en intégration de modèles prédictifs. Il constitue également une base crédible pour une évolution vers une solution plus réaliste, plus robuste et plus proche des besoins des établissements d'enseignement.
+
+\end{document}

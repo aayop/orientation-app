@@ -462,12 +462,12 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
   <div class="hero">
     <div class="hero-eyebrow"><span></span>Système ML d'orientation</div>
     <h1>Découvrez votre<br><span class="gradient">avenir académique</span><br>guidé par l'IA</h1>
-    <p>Renseignez votre profil scolaire. Notre modèle Random Forest entraîné sur 3 000 profils d'étudiants analyse vos données et prédit la filière qui vous correspond le mieux.</p>
+    <p>Renseignez votre profil scolaire. Notre modèle Random Forest entraîné sur 2 000 profils d'étudiants analyse vos données et propose une orientation probable.</p>
   </div>
 
   <div class="stats">
     <div class="stat">
-      <div class="stat-n">96<span>%</span></div>
+      <div class="stat-n">97<span>%</span></div>
       <div class="stat-l">Précision du modèle</div>
     </div>
     <div class="stat">
@@ -475,7 +475,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
       <div class="stat-l">Filières couvertes</div>
     </div>
     <div class="stat">
-      <div class="stat-n">3K<span>+</span></div>
+      <div class="stat-n">2K<span></span></div>
       <div class="stat-l">Profils analysés</div>
     </div>
   </div>
@@ -638,7 +638,9 @@ const DATA = {
     'Droit':['Droit privé','Droit public','Droit des affaires','Sciences politiques','Relations internationales'],
     'Architecture':['Architecture','Urbanisme & aménagement','Design intérieur','Génie civil','Arts plastiques'],
     'Langues':['Langues étrangères appliquées','Traduction & interprétariat','Linguistique','Lettres modernes','Communication'],
-    'Psychologie':['Psychologie clinique','Sciences de l\'éducation','Travail social','Philosophie','Sociologie']
+    'Psychologie':['Psychologie clinique','Sciences de l\'éducation','Travail social','Philosophie','Sociologie'],
+    'Profil à renforcer':['Remise à niveau','Soutien scolaire ciblé','Méthodes de travail','Bilan d\'orientation','Accompagnement personnalisé'],
+    'Profil ambigu':['Bilan d\'orientation','Exploration des filières proches','Entretien avec un conseiller','Renforcement ciblé','Comparaison des options']
   },
   descriptions:{
     'Informatique':'Ton profil analytique et tes aptitudes en sciences exactes te positionnent idéalement pour façonner le monde numérique de demain.',
@@ -648,7 +650,9 @@ const DATA = {
     'Droit':'Ta maîtrise du langage, ton sens critique et ton intérêt pour la justice te destinent à une carrière juridique remarquable.',
     'Architecture':'Ton mélange unique de rigueur scientifique et de sensibilité artistique est la signature rare d\'un futur grand architecte.',
     'Langues':'Ta passion pour la communication interculturelle et les langues du monde est un atout inestimable dans un marché globalisé.',
-    'Psychologie':'Ta profonde sensibilité humaine et ton goût pour la philosophie te destinent à aider et comprendre les autres.'
+    'Psychologie':'Ta profonde sensibilité humaine et ton goût pour la philosophie te destinent à aider et comprendre les autres.',
+    'Profil à renforcer':'Tes notes actuelles sont trop faibles pour recommander sérieusement une filière précise. Le plus utile est de consolider les bases avant de choisir une orientation.',
+    'Profil ambigu':'Le modèle détecte plusieurs orientations proches sans confiance suffisante pour donner un verdict unique. Compare les filières les plus probables avant de choisir.'
   },
   all:['Informatique','Médecine','Commerce','Ingénierie','Droit','Architecture','Langues','Psychologie']
 };
@@ -736,46 +740,25 @@ document.getElementById('form').addEventListener('submit',async function(e){
       });
       document.getElementById('result').style.display='block';
 
-      // Confidence bars (simulated from notes profile)
-      const notes=[
-        parseFloat(document.querySelector('[name=note_maths]').value),
-        parseFloat(document.querySelector('[name=note_sciences]').value),
-        parseFloat(document.querySelector('[name=note_physique]').value),
-        parseFloat(document.querySelector('[name=note_langues]').value),
-        parseFloat(document.querySelector('[name=note_philo]').value)
-      ];
-      const avg=notes.reduce((a,b)=>a+b,0)/notes.length;
-
-      const scores={
-        'Informatique': (notes[0]*2+notes[2]+notes[1])/4,
-        'Médecine':     (notes[1]*2+notes[0]+notes[2])/4,
-        'Commerce':     (notes[3]*2+notes[0]+notes[4])/4,
-        'Ingénierie':   (notes[2]*2+notes[0]+notes[1])/4,
-        'Droit':        (notes[4]*2+notes[3]+notes[0])/4,
-        'Architecture': (notes[0]+notes[2]+notes[3]+notes[1])/4,
-        'Langues':      (notes[3]*3+notes[4])/4,
-        'Psychologie':  (notes[4]*2+notes[1]+notes[3])/4
-      };
-
-      // Boost predicted
-      scores[ori]=Math.max(scores[ori],19);
-
-      const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,5);
-      const max=sorted[0][1];
+      const sorted=(json.probabilities||[])
+        .filter(item=>item.probability>0)
+        .slice(0,5);
+      const max=sorted.length ? sorted[0].probability : 0;
 
       const barsEl=document.getElementById('conf-bars');
       barsEl.innerHTML='';
-      sorted.forEach(([name,score])=>{
-        const pct=Math.round(score/max*100);
+      sorted.forEach(item=>{
+        const pct=Math.round(item.probability);
+        const width=max ? Math.round(item.probability/max*100) : 0;
         barsEl.innerHTML+=`
           <div class="conf-row">
-            <span class="conf-label">${name}</span>
-            <div class="conf-track"><div class="conf-fill" data-w="${pct}"></div></div>
+            <span class="conf-label">${item.orientation}</span>
+            <div class="conf-track"><div class="conf-fill" data-w="${width}"></div></div>
             <span class="conf-pct">${pct}%</span>
           </div>`;
       });
 
-      document.getElementById('conf-card').style.display='block';
+      document.getElementById('conf-card').style.display=sorted.length ? 'block' : 'none';
       setTimeout(()=>{
         document.querySelectorAll('.conf-fill').forEach(el=>{
           el.style.width=el.dataset.w+'%';

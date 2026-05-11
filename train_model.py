@@ -1,5 +1,7 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
@@ -10,22 +12,32 @@ df = pd.read_csv('moroccan_students.csv')
 print("Colonnes:", df.columns.tolist())
 print("Taille:", df.shape)
 
-# Encoder les colonnes textuelles
-le_dict = {}
-for col in df.select_dtypes(include='object').columns:
-    if col != 'orientation':
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col])
-        le_dict[col] = le
-
 X = df.drop('orientation', axis=1)
 y = df['orientation']
+categorical_cols = X.select_dtypes(include='object').columns.tolist()
+numeric_cols = [col for col in X.columns if col not in categorical_cols]
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('categorical', OneHotEncoder(handle_unknown='ignore'), categorical_cols),
+        ('numeric', 'passthrough', numeric_cols),
+    ]
 )
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+model = Pipeline(
+    steps=[
+        ('preprocessor', preprocessor),
+        ('classifier', RandomForestClassifier(
+            n_estimators=300,
+            random_state=42,
+            class_weight='balanced',
+        )),
+    ]
+)
 model.fit(X_train, y_train)
 
 pred = model.predict(X_test)
@@ -36,5 +48,5 @@ print(classification_report(y_test, pred))
 
 joblib.dump(model, 'model.pkl')
 joblib.dump(list(X.columns), 'columns.pkl')
-joblib.dump(le_dict, 'encoders.pkl')
+joblib.dump({}, 'encoders.pkl')
 print("\nModèle sauvegardé !")
